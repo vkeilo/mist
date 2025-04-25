@@ -106,6 +106,30 @@ def parse_args():
             "Whether to keep the original shape of the image or not."
         ),
     )
+    parser.add_argument(
+        "--concept_prompt",
+        type=str,
+        default="a painting",
+        help=(
+            "Prompt of the concept we want to protect."
+        ),
+    )
+    parser.add_argument(
+        "--model_path",
+        type=str,
+        default="",
+        help=(
+            "ckpt path of the model."
+        ),
+    )
+    parser.add_argument(
+        "--model_config",
+        type=str,
+        default="",
+        help=(
+            "yaml config path of the model."
+        ),
+    )
     args = parser.parse_args()
     return args
 

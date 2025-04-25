@@ -31,3 +31,14 @@ misted_*.png
 *.sh
 __pycache__/
 *__pycache__*
+
+data/
+.vscode
+.DS_Store
+run_in_batch/*.json
+wandb
+outputs
+*.log
+exp_datas_output/*
+!exp_datas_output/*.sh
+finished_test

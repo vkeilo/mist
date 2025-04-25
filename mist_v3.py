@@ -149,7 +149,7 @@ class target_model(nn.Module):
             return self.fn(zx, zy) - loss_semantic * self.rate
 
 
-def init(epsilon: int = 16, steps: int = 100, alpha: int = 1,
+def init(args,epsilon: int = 16, steps: int = 100, alpha: int = 1,
          input_size: int = 512, object: bool = False, seed: int = 23,
          ckpt: str = None, base: str = None, mode: int = 2, rate: int = 10000):
     """
@@ -168,14 +168,16 @@ def init(epsilon: int = 16, steps: int = 100, alpha: int = 1,
     """
 
     if ckpt is None:
-        ckpt = 'models/ldm/stable-diffusion-v1/model.ckpt'
+        ckpt = 'ldm/stable-diffusion-v1/model.ckpt'
 
     if base is None:
         base = 'configs/stable-diffusion/v1-inference-attack.yaml'
 
     seed_everything(seed)
-    imagenet_templates_small_style = ['a painting']
-    imagenet_templates_small_object = ['a photo']
+    # DiffAdvPerturbationBench set imagenet_templates_small as an input argument
+    # imagenet_templates_small_style = ['a painting']
+    # imagenet_templates_small_object = ['a photo']
+    input_prompt = [args.concept_prompt]
 
     config_path = os.path.join(os.getcwd(), base)
     config = OmegaConf.load(config_path)
@@ -184,13 +186,13 @@ def init(epsilon: int = 16, steps: int = 100, alpha: int = 1,
     model = load_model_from_config(config, ckpt_path).to(device)
 
     fn = identity_loss()
+    
+    # if object:
+    #     imagenet_templates_small = imagenet_templates_small_object
+    # else:
+    #     imagenet_templates_small = imagenet_templates_small_style
 
-    if object:
-        imagenet_templates_small = imagenet_templates_small_object
-    else:
-        imagenet_templates_small = imagenet_templates_small_style
-
-    input_prompt = [imagenet_templates_small[0] for i in range(1)]
+    # input_prompt = [imagenet_templates_small[0] for i in range(1)]
     net = target_model(model, input_prompt, mode=mode, rate=rate)
     net.eval()
 
@@ -285,7 +287,7 @@ if __name__ == "__main__":
     bls = input_size//block_num
     if args.input_dir_path:
         image_dir_path = args.input_dir_path
-        config = init(epsilon=epsilon, steps=steps, mode=mode, rate=rate)
+        config = init(args, epsilon=epsilon, steps=steps, mode=mode, rate=rate)
         config['parameters']["input_size"] = bls
 
         for img_id in os.listdir(image_dir_path):
@@ -317,12 +319,19 @@ if __name__ == "__main__":
 
                     output_image[bls_w*i: bls_w*i+bls_w, bls_h*j: bls_h*j + bls_h] = infer(img_block, config, tar_block, input_mask)
             output = Image.fromarray(output_image.astype(np.uint8))
-            output_dir = os.path.join('outputs/dirs', args.output_dir)
-            class_name = '_' + str(epsilon) + '_' + str(steps) + '_' + str(input_size) + '_' + str(block_num) + '_' + str(mode) + '_' + str(args.rate) + '_' + str(int(mask)) + '_' + str(int(resize))
-            output_path_dir = output_dir + class_name
+            # DiffAdvPerturbationBench change it
+            # output_dir = os.path.join('outputs/dirs', args.output_dir)
+            # class_name = '_' + str(epsilon) + '_' + str(steps) + '_' + str(input_size) + '_' + str(block_num) + '_' + str(mode) + '_' + str(args.rate) + '_' + str(int(mask)) + '_' + str(int(resize))
+            # output_path_dir = output_dir + class_name
+            # output_path_dir = output_dir
+            output_path_dir = os.path.join(args.output_dir, "noise-ckpt")
             if not os.path.exists(output_path_dir):
                 os.mkdir(output_path_dir)
-            output_path = os.path.join(output_path_dir, img_id)
+            output_path_dir_withsteps = os.path.join(output_path_dir, str(steps))
+            if not os.path.exists(output_path_dir_withsteps):
+                os.mkdir(output_path_dir_withsteps)
+            print(output_path_dir_withsteps)
+            output_path = os.path.join(output_path_dir_withsteps, "noise_"+img_id)
             print("Output image saved in path {}".format(output_path))
             output.save(output_path)
     else:
@@ -364,3 +373,4 @@ if __name__ == "__main__":
         output_name += save_parameter + '.png'
         print("Output image saved in path {}".format(output_name))
         output.save(output_name)
+    print("exp finished")
