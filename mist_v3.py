@@ -167,11 +167,11 @@ def init(args,epsilon: int = 16, steps: int = 100, alpha: int = 1,
     :returns: a dictionary containing model and config.
     """
 
-    if ckpt is None:
-        ckpt = 'ldm/stable-diffusion-v1/model.ckpt'
+    # if ckpt is None:
+    #     ckpt = 'ldm/stable-diffusion-v1/model.ckpt'
 
-    if base is None:
-        base = 'configs/stable-diffusion/v1-inference-attack.yaml'
+    # if base is None:
+    #     base = 'configs/stable-diffusion/v1-inference-attack.yaml'
 
     seed_everything(seed)
     # DiffAdvPerturbationBench set imagenet_templates_small as an input argument
@@ -179,10 +179,12 @@ def init(args,epsilon: int = 16, steps: int = 100, alpha: int = 1,
     # imagenet_templates_small_object = ['a photo']
     input_prompt = [args.concept_prompt]
 
-    config_path = os.path.join(os.getcwd(), base)
+    # config_path = os.path.join(os.getcwd(), base)
+    config_path = base
     config = OmegaConf.load(config_path)
 
-    ckpt_path = os.path.join(os.getcwd(), ckpt)
+    # ckpt_path = os.path.join(os.getcwd(), ckpt)
+    ckpt_path = ckpt
     model = load_model_from_config(config, ckpt_path).to(device)
 
     fn = identity_loss()
@@ -287,7 +289,7 @@ if __name__ == "__main__":
     bls = input_size//block_num
     if args.input_dir_path:
         image_dir_path = args.input_dir_path
-        config = init(args, epsilon=epsilon, steps=steps, mode=mode, rate=rate)
+        config = init(args, epsilon=epsilon, steps=steps, mode=mode, rate=rate, base=args.model_config,ckpt=args.model_path)
         config['parameters']["input_size"] = bls
 
         for img_id in os.listdir(image_dir_path):
