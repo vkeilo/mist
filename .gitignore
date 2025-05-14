@@ -28,7 +28,6 @@ misted_*.png
 *.ckpt
 *.ipynb_checkpoints*
 *.npz
-*.sh
 __pycache__/
 *__pycache__*
 

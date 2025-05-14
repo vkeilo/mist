@@ -58,27 +58,27 @@ def generate_lin_interval_list(start, end, num):
     return np.linspace(start, end, num=num).tolist()
 
 
-test_lable = "Mist_VGGFace2_random50_r4p8p12p16_test"
+test_lable = "Mist_SD21_Wikiart_random50_r4p8p12p16"
 params_options = {
     "EXPERIMENT_NAME": ["Mist"],
     "data_path": [f"{proj_abs_path}/datasets"],
-    "dataset_name":["VGGFace2-clean"],
-    # "data_id":[i for i in range(50)],
+    "dataset_name":["wikiart-data"],
+    "data_id":[i for i in range(50)],
     # "data_id":[0],
-    "data_id":[0,1],
-    "r": [4],
+    # "data_id":[0,1],
+    "r": [4,8,12,16],
     "attack_steps": [100],
     # "mixed_precision":['fp16'],
     # "model_path":['/data/home/yekai/github/MetaCloak-local/SD/v1-5-pruned.ckpt'],
     "model_path":['/data/home/yekai/github/MetaCloak-local/SD/v2-1_512-ema-pruned.ckpt'],
     # "model_config":['/data/home/yekai/github/DiffAdvPerturbationBench/Algorithms/mist/configs/stable-diffusion/v1-inference-attack.yaml'],
     "model_config":['/data/home/yekai/github/DiffAdvPerturbationBench/Algorithms/mist/configs/stable-diffusion/v2-inference-v-attack.yaml'],
-    "concept_prompt":['a photo'],
+    # "a painting"  'a photo'
+    "concept_prompt":['a painting'],
     "mode": [2],
     "rate": [1],
     "block_num": [1],
     "input_size": [512],
-    "attack_steps": [100],
 }
 
 # Number of times to repeat each configuration
